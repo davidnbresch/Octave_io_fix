@@ -1,7 +1,8 @@
 Octave_io_fix - a special climada module
 =============
 
-Fix for io in Octave if problems with installing properly (using pkg)
+Fix for io in Octave if problems with installing properly (using pkg), tested on Mac Air, under OS X Yosemite, Version 10.10.1 (computer in Octave returns x86_64-apple-darwin13.0.0) and Octave version 3.8.0. 
+Note that the issue did not occurr on Mac Air with OS X version 10.9.5 (computer in Octave returns x86_64-apple-darwin13.0.0).
 
 This climada module contains the CRUDE work-around for cases where the Octave package io-2.2.6.tar can not be installed by a call like
 
