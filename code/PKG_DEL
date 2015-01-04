@@ -1,0 +1,10 @@
+## PKG_DEL
+##
+## All we need to do is try to remove all Java spreadsheet class libs loaded
+## by chk_spreadsheet_support.m from the javaclasspath
+
+try
+  chk_spreadsheet_support ("", -1);
+catch
+  warning ("Couldn't remove spreadsheet I/O javaclasspath entries while unloading io pkg");
+end_try_catch

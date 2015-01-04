@@ -1,0 +1,2147 @@
+# Created by Octave 3.8.0, Thu Jan 01 09:17:51 2015 CET <bresch@iacmac-ds3847-Bresch.local>
+# name: cache
+# type: cell
+# rows: 3
+# columns: 31
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+append_save
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 799
+ append_save M-file function
+
+ Objective: be able to add variables to existing save files. Works for
+ all the types of save files that "save" supports.
+ 
+ Input: 
+ 1) A string which specifies the existing save file.
+ 2) The options you need to pass to the 'save' function to save to the
+ file type that you want.
+ 3) A 1x2 cell, with the first element being a string representation
+ of the variable/symbol that you're trying to add, followed by the
+ actual variable/symbol itself.
+ 4) Any number of additional 1x2 cells, following the same format as
+ the 3rd argument specified immediately before this one.
+
+ Output:
+ Currently, none. But there might be some debugging / error-code
+ messages in the future.
+
+ Example:
+ octave> B = ones(2,2);
+ octave> append_save( "test.txt", "-binary", {"B", B } )
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 28
+ append_save M-file function
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 15
+calccelladdress
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 239
+ calccelladdress (R, C) - compute spreadsheet style cell address from
+ row & column index (both 1-based).
+ 
+ Max column index currently set to 18278 (max ODS: 1024, OOXML: 16384).
+ Row limits for ODF and OOXML are 65536 and 1048576, resp.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+ calccelladdress (R, C) - compute spreadsheet style cell address from
+ row & col
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 23
+chk_spreadsheet_support
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 5092
+ -- Function File: [ RETVAL, INTFS, LJARS ] = chk_spreadsheet_support ()
+ -- Function File: [ RETVAL, INTFS, LJARS ] = chk_spreadsheet_support (
+          PATH_TO_JARS )
+ -- Function File: [ RETVAL, INTFS, LJARS ] = chk_spreadsheet_support (
+          PATH_TO_JARS, DEBUG_LEVEL )
+ -- Function File: [ RETVAL, INTFS, LJARS ] = chk_spreadsheet_support (
+          PATH_TO_JARS, DEBUG_LEVEL, PATH_TO_OOO )
+     Check Octave environment for spreadsheet I/O support, report any
+     problems, and optionally add or remove Java class libs for
+     spreadsheet support.
+
+     chk_spreadsheet_support first checks ActiveX (native MS-Excel);
+     then Java JRE presence, then Java support (if builtin); then checks
+     existing javaclasspath for Java class libraries (.jar files) needed
+     for various Java-based spreadsheet I/O interfaces.  If requested
+     chk_spreadsheet_support will try to add the relevant Java class
+     libs to the dynamic javaclasspath.  chk_spreadsheet_support
+     remembers which Java class libs it has added to the javaclasspath;
+     optionally it can unload them as well.
+
+     PATH_TO_JARS - relative or absolute path name to subdirectory
+     containing these classes.  TAKE NOTICE: /forward/ slashes are
+     needed!  chk_spreadsheet_support() will recurse into at most two
+     subdir levels; if the Java class libs are scattered across deeper
+     subdir levels or further apart in the file system, multiple calls
+     to chk_spreadsheet_support may be required.  PATH_TO_JARS can be []
+     or " if no class libs need to be added to the javaclasspath.
+
+     PATH_TO_OOO - installation directory of OpenOffice.org (again with
+     /forward/ slashes).  Usually that is something like (but no
+     guarantees):
+          - Windows: C:/Program Files/OpenOffice.org or C:/Program Files
+          (X86)/LibreOffice
+
+          - *nix: /usr/lib/ooo or /opt/libreoffice
+
+          - Mac OSX: ?????
+
+          IMPORTANT: PATH_TO_OOO should be such that both:
+               1. PATH_TO_OOO/program/
+                 and
+               2. PATH_TO_OOO/ure/.../ridl.jar
+               resolve OK.
+
+     (Note that LibreOffice/OOo should match the bit width (32bit or
+     64bit) of the Java version Octave was built with.)
+
+     DEBUG_LEVEL: (integer) between [0 (no output) ..  3 (full output]
+     0
+          No debug output is generated.
+
+     1
+          Only proper operation of main interface groups (COM, Java) is
+          shown.  If PATH_TO_JARS and/or PATH_TO_OOO was supplied,
+          chk_spreadsheet_support indicates whether it could find the
+          required Java class libs for all interfaces
+
+     2
+          Like 1, proper working of individual implemented Java-based
+          interfaces is shown as well.  If PATH_TO_JARS and/or
+          PATH_TO_OOO was supplied, chk_spreadsheet_support indicates
+          for each individual Java-based interface whether it could add
+          the required Java class libs.
+
+     3
+          Like 2, also presence of individual javaclass libs in
+          javaclasspath is indicated.  If PATH_TO_JARS and/or
+          PATH_TO_OOO was supplied, chk_spreadsheet_support reports for
+          each individual Java-based interface which required Java class
+          libs it could find and add to the javaclasspath.
+
+     -1 (or any negative number)
+          Remove all directories and Java class libs that
+          chk_spreadsheet_support added to the javaclasspath.  If
+          DEBUG_LEVEL < 1 report number of removed javclasspath entries;
+          if DEBUG_LEVEL < 2 report each individual removed entry.
+
+     Output: RETVAL = 0: only spreadsheet support for OOXML & ODS 1.2
+     and read support for gnumeric present through OCT interface, or
+     RETVAL <> 0: At least one read/write spreadsheet I/O interface
+     found based on external software.  RETVAL will be set to the sum of
+     values for found interfaces:
+              0 = OCT (Native Octave)
+                  (read/write support for .xlsx and .ods, read support for .gnumeric)
+            ----------- XLS (Excel) interfaces: ----------
+              1 = COM (ActiveX / Excel) (any file format supported by MS-Excel)
+              2 = POI (Java / Apache POI) (Excel 97-2003 = BIFF8)
+              4 = POI+OOXML (Java / Apache POI) (Excel 2007-2010 = OOXML)
+              8 = JXL (Java / JExcelAPI) (Excel 95-read and Excel-97-2003-r/w)
+             16 = OXS (Java / OpenXLS) (Excel 97-2003)
+            ---- ODS (OpenOffice.org Calc) interfaces ----
+             32 = OTK (Java/ ODF Toolkit) (ODS 1.2)
+             64 = JOD (Java / jOpenDocument) (.sxc (old OOo)-read, ODS 1.2)
+            ------------------ XLS & ODS: ----------------
+              0 = OOXML / ODS read/write-, gnumeric read support (built-in)
+            128 = UNO (Java/UNO bridge - OpenOffice.org) (any format supported by OOo)
+
+     INTFS: listing of supported spreadsheet interfaces.  The OCT
+     interface is always supported.
+
+     LJARS: listing of full paths of Java class libs and directories
+     that chk_spreadsheet_support has added to the javaclasspath.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Check Octave environment for spreadsheet I/O support, report any
+problems, and o
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+dbfread
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3446
+ -- Function File: [ DATA , DATINFO] = dbfread (FNAME)
+ -- Function File: [ DATA , DATINFO] = dbfread (FNAME, RECS)
+ -- Function File: [ DATA , DATINFO] = dbfread (FNAME, RECS, COLS)
+ -- Function File: [ DATA , DATINFO] = dbfread (FNAME, RECS, COLS, RE)
+     Read contents of a dbase (dbf) file, provisionally dbase III+, IV
+     or V.
+
+        * FNAME should be the name of a valid dbase file; the file
+          extension isn't required.
+
+        * RECS can be an integer or logical array containing record
+          numbers or record indicators for those records that need to be
+          returned.  If omitted, all records are read.  Indices supplied
+          in RECS can be specified in any order, but the returned data
+          are sorted in order of records in the file.
+
+        * COLS can be a logical, integer, cellstr or character array
+          indicating from which file columns the data should be
+          returned.  If a numeric array is supplied, it is considered to
+          be like a logical array if the maximum entry value equals 1.
+          Character arrays should have column names stacked in the
+          vertical (first) dimension.  COLS cellstr or char arrays can
+          be supplied in any order, yet the returned data column order
+          matches that of the columns order in the dbase file.  For
+          dbase files containing multiple columns with the same name,
+          specify a numeric or logical array to select columns to be
+          returned.  If omitted, data from all file columns are
+          returned.
+
+        * If a value of 1 or true is entered for RE, dbfread also tries
+          to return data from erased records.  No guarantee can be given
+          for these data to be correct or consistent!  If omitted,
+          erased records are skipped.
+
+        * Return value DATA is a N+1 x M cellstr array where the
+          uppermost row contains the column names and the rest of the
+          rows the record data.
+
+        * Optional return argument DATINFO is a struct array containing
+          various information of the dbase file and record build-up.
+
+     Arguments RECS and COLS need not be as long as the number of
+     records and columns in the file, resp.; dbfread will stop reading
+     data if any of RECS or COLS (if supplied) is exhausted.
+
+     Sometimes dbase files contain records indicated as being erased.
+     The data in such records is silently skipped, unless the RE flag is
+     set and/or RECS is supplied and erased records happen to be present
+     in the requested record numbers.
+
+     Examples:
+
+            A = dbfread ('file.dbf');
+            (returns all data in file.dbf in array A)
+
+            [A, B] = dbfread ('file.dbf', [], ["colB";"colF"]);
+            (returns all data in columns named "colB" and "colF" from
+             file.dbf in array A and information on the database
+             build-up in struct B)
+
+            A = dbfread ('file.dbf', [0 1 0 0 1 0 0]);
+                 -or-
+            A = dbfread ('file.dbf', [2 5]);
+            (returns data from record numbers 2 and 5 in
+             file.dbf in array A)
+
+            A = dbfread ('file.dbf', [0 1 0 0 1 0]);
+            (returns data from record numbers 2 and 5 in
+             file.dbf in array A)
+
+            [~, B] = dbfread ('file.dbf', 0);
+            (to returns info on column names and number of
+             records, plus more info)
+
+     See also: xlsread.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 71
+Read contents of a dbase (dbf) file, provisionally dbase III+, IV or V.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6
+fexist
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 678
+ -- Function File: ex = fexist (file, tspec, aspec)
+     Checks whether a file exists.  FILE is the queried file path.
+     TSPEC is a combination of letters f,d,p,S, corresponding to file
+     types:
+        * f: regular file
+        * d: directory
+        * p: named pipe (FIFO special file)
+        * S: socket
+
+     The query is true if the actual file type matches any of the
+     specified options.
+
+     ASPEC is a combination of letters r,w,x, corresponding to queried
+     access privileges to the file.  The query is true if the current
+     user has all the spefied types of access, either through "user",
+     "group" or "other" specs.
+
+     See also: stat, lstat.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 29
+Checks whether a file exists.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+getxmlattv
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 200
+ -- Function File: [ RETVAL ] = getxmlattv (XMLNODE, ATT)
+     Get value of attribute ATT in xml node (char string) XMLNODE,
+     return empty if attribute isn't present.
+
+     See also: getxmlnode.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Get value of attribute ATT in xml node (char string) XMLNODE, return
+empty if at
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 10
+getxmlnode
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 504
+ -- Function File: [ NODE , S, E ] = getxmlnode (XML, TAG)
+ -- Function File: [ NODE , S, E ] = getxmlnode (XML, TAG, IS)
+ -- Function File: [ NODE , S, E ] = getxmlnode (XML, TAG, IS, CONTNT)
+     Get a string representing the first xml TAG node starting at
+     position IS in xml text string XML, and return start and end
+     indices.  If IS is omitted it defaults to 1 (start of XML).  If
+     CONTNT is TRUE, return the portion of the node between the outer
+     tags.
+
+     See also: getxmlattv.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Get a string representing the first xml TAG node starting at position IS
+in xml 
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+io_ods_testscript
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1203
+ -- Function File: io_ods_testscript ( INTF1)
+ -- Function File: io_ods_testscript ( INTF1, FNAME)
+ -- Function File: io_ods_testscript ( INTF1, FNAME, INTF2)
+     Try to check proper operation of ODS spreadsheet scripts using
+     interface INTF1.
+
+     INTF1 can be one of OTK, JOD, UNO, or OCT. No checks are made as to
+     whether the requested interface is supported at all.  If FNAME is
+     supplied, that filename is used for the tests, otherwise filename
+     "io-test.ods" is chosen by default.  This parameter is required to
+     have e.g., JOD distinguish between testing (reading) .ods (ODS 1.2)
+     and .sxc (old OpenOffice.org & StarOffice) files (that UNO can
+     write).
+
+     If INTF2 is supplied, that interface will be used for writing the
+     spreadsheet file and INTF1 will be used for reading.  The OCT
+     interface doesn't have write support (yet), so it will read
+     spreadsheet files made by OTK (if supported) unless another
+     interface is supplied for INTF2.
+
+     As the tests are meant to be run interactively, no output arguments
+     are returned.  The results of all test steps are printed on the
+     terminal.
+
+     See also: test_spsh, io_xls_testscript.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 79
+Try to check proper operation of ODS spreadsheet scripts using interface
+INTF1.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 17
+io_xls_testscript
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1157
+ -- Function File: io_xls_testscript ( INTF1)
+ -- Function File: io_xls_testscript ( INTF1, FNAME)
+ -- Function File: io_xls_testscript ( INTF1, FNAME, INTF2)
+     Try to check proper operation of XLS / XLSX spreadsheet scripts
+     using interface INTF1.
+
+     INTF1 can be one of COM, POI, JXL, OXS, UNO, or OCT. No checks are
+     made as to whether the requested interface is supported at all.  If
+     FNAME is supplied, that filename is used for the tests, otherwise
+     filename "io-test.xls" is chosen by default.  This parameter is
+     required to have e.g., POI distinguish between testing .xls (BIFF8)
+     and .xlsx (OOXML) files.
+
+     If INTF2 is supplied, that interface will be used for writing the
+     spreadsheet file and INTF1 will be used for reading.  The OCT
+     interface doesn't have write support (yet), so it will read
+     spreadsheet files made by POI (if supported) unless another
+     interface is supplied for INTF2.
+
+     As the tests are meant to be run interactively, no output arguments
+     are returned.  The results of all test steps are printed on the
+     terminal.
+
+     See also: test_spsh, io_ods_testscript.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Try to check proper operation of XLS / XLSX spreadsheet scripts using
+interface 
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 11
+object2json
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1582
+ Returns a valid json string that will describe object; the string will
+ be in a compact form (no spaces or line breaks).
+
+ It will map simple octave values this way:
+   function handles: string with the name of the function
+   double (numbers): depends:
+     If it's real it will map to a string representing that number
+     If it's complex it will map to an object with the next properties:
+       real: real part of the number
+       imag: imaginary part of the number
+   char: A string enclosed by double quotes representing that character
+   logical: text sring "true" or "false" (w/o double quotes)
+ And will map more complex octave values this other way:
+   struct: an object with properties equal to the struct's field names
+     and value equal to the json counterpart of that field
+   cell: it will be mapped depending on the value of the cell (for
+     example {i} will be mapped to an object with real=0 and imag=1)
+   vectors or cell arrays: it will map them to a corresponding js
+     array (same size) with the values transformed to their json
+     counterpart (Note: that in javascript all arrays are like octave's
+     cells ,i.e. they can store different type and size variables)
+   strings or char vectors: they will be mapped to the same string
+     enclosed by double quotes
+ Other octave values will be mapped to a string enclosed by double
+ quotes with the value that the class() function returns
+ It can handle escape sequences and special chars automatically.
+ If they're valid in JSON it will keep them if not they'll be
+ escaped so they can become valid
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+ Returns a valid json string that will describe object; the string will
+ be in a
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+oct2ods
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3295
+ -- Function File: [ ODS , RSTATUS ] = oct2ods (ARR, ODS)
+ -- Function File: [ ODS , RSTATUS ] = oct2ods (ARR, ODS, WSH)
+ -- Function File: [ ODS , RSTATUS ] = oct2ods (ARR, ODS, WSH, RANGE)
+ -- Function File: [ ODS , RSTATUS ] = oct2ods (ARR, ODS, WSH, RANGE,
+          OPTIONS)
+
+     Transfer data to an OpenOffice_org Calc (or gnumeric) spreadsheet
+     previously opened by odsopen().
+
+     Data in 1D/2D array ARR are transferred into a cell range RANGE in
+     sheet WSH.  ODS must have been made earlier by odsopen().  Return
+     argument ODS should be the same as supplied argument ODS and is
+     updated by oct2ods.  A subsequent call to odsclose is needed to
+     write the updated spreadsheet to disk (and -if needed- close the
+     Java invocation holding the file pointer).
+
+     ARR can be any 1D or 2D array containing numerical or character
+     data (cellstr) except complex.  Mixed numeric/text arrays can only
+     be cell arrays.
+
+     ODS must be a valid pointer struct created earlier by odsopen.
+
+     WSH can be a number (sheet name) or string (sheet number).  In case
+     of a yet non-existing Calc file, the first sheet will be used &
+     named according to WSH.  In case of existing files, some checks are
+     made for existing sheet names or numbers.  When new sheets are to
+     be added to the Calc file, they are inserted to the right of all
+     existing sheets.  The pointer to the "active" sheet (shown when
+     Calc opens the file) remains untouched.
+
+     If RANGE omitted, the top left cell where the data will be put is
+     supposed to be 'A1'; only a top left cell address can be specified
+     as well.  In these cases the actual range to be used is determined
+     by the size of ARR.  Be aware that large data array sizes may
+     exhaust the java shared memory space.  For larger arrays,
+     appropriate memory settings are needed in the file java.opts; then
+     the maximum array size for the java-based spreadsheet options can
+     be in the order of perhaps 10^6 elements.
+
+     Optional argument OPTIONS, a structure, can be used to specify
+     various write modes.  Currently the only option field is
+     "formulas_as_text", which -if set to 1 or TRUE- specifies that
+     formula strings (i.e., text strings starting with "=" and ending in
+     a ")" ) should be entered as litteral text strings rather than as
+     spreadsheet formulas (the latter is the default).  As jOpenDocument
+     doesn't support formula I/O at all yet, this option is ignored for
+     the JOD interface.
+
+     Data are added to the sheet, ignoring other data already present;
+     existing data in the range to be used will be overwritten.
+
+     If RANGE contains merged cells, also the elements of ARR not
+     corresponding to the top or left Calc cells of those merged cells
+     will be written, however they won't be shown until in Calc the
+     merge is undone.
+
+     Examples:
+
+            [ods, status] = ods2oct (arr, ods, 'Newsheet1', 'AA31:GH165');
+            Write array arr into sheet Newsheet1 with upperleft cell at AA31
+
+            [ods, status] = ods2oct ({'String'}, ods, 'Oldsheet3', 'B15:B15');
+            Put a character string into cell B15 in sheet Oldsheet3
+
+     See also: ods2oct, odsopen, odsclose, odsread, odswrite, odsfinfo.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Transfer data to an OpenOffice_org Calc (or gnumeric) spreadsheet
+previously ope
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+oct2xls
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3333
+ -- Function File: [ XLS , RSTATUS ] = oct2xls (ARR, XLS)
+ -- Function File: [ XLS , RSTATUS ] = oct2xls (ARR, XLS, WSH)
+ -- Function File: [ XLS , RSTATUS ] = oct2xls (ARR, XLS, WSH, RANGE)
+ -- Function File: [ XLS , RSTATUS ] = oct2xls (ARR, XLS, WSH, RANGE,
+          OPTIONS)
+
+     Add data in 1D/2D CELL array ARR into a cell range RANGE in
+     worksheet WSH in an Excel (or gnumeric) spreadsheet file pointed to
+     in structure XLS.  Return argument XLS equals supplied argument XLS
+     and is updated by oct2xls.
+
+     A subsequent call to xlsclose is needed to write the updated
+     spreadsheet to disk (and -if needed- close the Excel or Java
+     invocation).
+
+     ARR can be any 1D or 2D array containing numerical or character
+     data (cellstr) except complex.  Mixed numeric/text arrays can only
+     be cell arrays.
+
+     XLS must be a valid pointer struct created earlier by xlsopen.
+
+     WSH can be a number or string (max.  31 chars).  In case of a yet
+     non-existing Excel file, the first worksheet will be used & named
+     according to WSH - extra empty worksheets that Excel creates by
+     default are deleted.  In case of existing files, some checks are
+     made for existing worksheet names or numbers, or whether WSH refers
+     to an existing sheet with a type other than worksheet (e.g.,
+     chart).  When new worksheets are to be added to the Excel file,
+     they are inserted to the right of all existing worksheets.  The
+     pointer to the "active" sheet (shown when Excel opens the file)
+     remains untouched.
+
+     If RANGE is omitted or just the top left cell of the range is
+     specified, the actual range to be used is determined by the size of
+     ARR.  If nothing is specified for RANGE the top left cell is
+     assumed to be 'A1'.
+
+     Data are added to the worksheet, ignoring other data already
+     present; existing data in the range to be used will be overwritten.
+
+     If RANGE contains merged cells, only the elements of ARR
+     corresponding to the top or left Excel cells of those merged cells
+     will be written, other array cells corresponding to that cell will
+     be ignored.
+
+     Optional argument OPTIONS, a structure, can be used to specify
+     various write modes.  Currently the only option field is
+     "formulas_as_text", which -if set to 1 or TRUE- specifies that
+     formula strings (i.e., text strings starting with "=" and ending in
+     a ")" ) should be entered as litteral text strings rather than as
+     spreadsheet formulas (the latter is the default).
+
+     Beware that -if invoked- Excel invocations may be left running
+     silently in case of COM errors.  Invoke xlsclose with proper
+     pointer struct to close them.  When using Java, note that large
+     data array sizes elements may exhaust the Java shared memory space
+     for the default java memory settings.  For larger arrays,
+     appropriate memory settings are needed in the file java.opts; then
+     the maximum array size for the Java-based spreadsheet options may
+     be in the order of 10^6 elements.  In caso of UNO this limit is not
+     applicable and spreadsheets may be much larger.
+
+     Examples:
+
+            [xlso, status] = xls2oct ('arr', xlsi, 'Third_sheet', 'AA31:AB278');
+
+     See also: xls2oct, xlsopen, xlsclose, xlsread, xlswrite, xlsfinfo.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Add data in 1D/2D CELL array ARR into a cell range RANGE in worksheet
+WSH in an 
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+ods2oct
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3783
+ -- Function File: [ RAWARR , ODS, RSTATUS ] = ods2oct (ODS)
+ -- Function File: [ RAWARR , ODS, RSTATUS ] = ods2oct (ODS, WSH)
+ -- Function File: [ RAWARR , ODS, RSTATUS ] = ods2oct (ODS, WSH, RANGE)
+ -- Function File: [ RAWARR , ODS, RSTATUS ] = ods2oct (ODS, WSH, RANGE,
+          OPTIONS)
+
+     Read data contained within cell range RANGE from worksheet WSH in
+     an OpenOffice_org Calc or Gnumeric spreadsheet file pointed to in
+     struct ODS.
+
+     ODS is supposed to have been created earlier by odsopen in the same
+     octave session.
+
+     WSH is either numerical or text, in the latter case it is
+     case-sensitive.  Note that in case of a numerical WSH this number
+     refers to the position in the worksheet stack, counted from the
+     left in a Calc window.  The default is numerical 1, i.e.  the
+     leftmost worksheet in the ODS or gnumeric file.
+
+     RANGE is expected to be a regular spreadsheet range format, or ""
+     (empty string, indicating all data in a worksheet).  If no range is
+     specified the occupied cell range will have to be determined behind
+     the scenes first; this can take some time.
+
+     Optional argument OPTIONS, a structure, can be used to specify
+     various read modes by setting option fields in the struct to true
+     (1) or false (0).  Currently recognized option fields are:
+
+     "formulas_as_text"
+          If set to TRUE or 1, spreadsheet formulas (if at all present)
+          are read as formula strings rather than the evaluated formula
+          result values.  This only works for the OTK, UNO and OCT
+          interfaces.  The default value is 0 (FALSE).
+
+     'strip_array'
+          Set the value of this field set to TRUE or 1 to strip the
+          returned output array RAWARR from empty outer columns and
+          rows.  The spreadsheet cell rectangle limits from where the
+          data actually came will be updated.  The default value is
+          FALSE or 0 (no cropping).
+
+     If only the first argument ODS is specified, ods2oct will try to
+     read all contents from the first = leftmost (or the only) worksheet
+     (as if a range of '' (empty string) was specified).
+
+     If only two arguments are specified, ods2oct assumes the second
+     argument to be WSH.  In that case ods2oct will try to read all data
+     contained in that worksheet.
+
+     Return argument RAWARR contains the raw spreadsheet cell data.  Use
+     parsecell() to separate numeric and text values from RAWARR.
+
+     Optional return argument ODS contains the pointer struct.  Field
+     ODS.limits contains the outermost column and row numbers of the
+     actually read cell range.
+
+     Optional return argument RSTATUS will be set to 1 if the requested
+     data have been read successfully, 0 otherwise.
+
+     Erroneous data and empty cells turn up empty in RAWARR.  Date/time
+     values in OpenOffice.org or Gnumeric are returned as numerical
+     values with base 1-1-0000 (same as octave).  But beware that Excel
+     spreadsheets rewritten by OpenOffice.org into .ods format may have
+     numerical date cells with epoch (base) 01-01-1900 (same as
+     MS-Excel).
+
+     When reading from merged cells, all array elements NOT
+     corresponding to the leftmost or upper OpenOffice.org Calc or
+     Gnumeric cell will be treated as if the "corresponding" cells are
+     empty.
+
+     Examples:
+
+            A = ods2oct (ods1, '2nd_sheet', 'C3:ABS40000');
+            (which returns the numeric contents in range C3:ABS40000 in worksheet
+            '2nd_sheet' from a spreadsheet file pointed to in pointer struct ods1,
+            into numeric array A)
+
+            [An, ods2, status] = ods2oct (ods2, 'Third_sheet');
+
+     See also: odsopen, odsclose, parsecell, odsread, odsfinfo, oct2ods,
+     odswrite.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Read data contained within cell range RANGE from worksheet WSH in an
+OpenOffice_
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+odsclose
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1576
+ -- Function File: [ ODS ] = odsclose (ODS)
+ -- Function File: [ ODS ] = odsclose (ODS, FILENAME)
+ -- Function File: [ ODS ] = odsclose (ODS, "FORCE")
+     Close the OpenOffice_org Calc / Gnumeric spreadsheet pointed to in
+     struct ODS, if needed write the file to disk.  odsclose will
+     determine if the file must be written to disk based on information
+     contained in ODS.  An empty pointer struct will be returned if no
+     errors occurred.  Optional argument FILENAME can be used to write
+     changed spreadsheet files to an other file than opened by
+     odsopen().  Optional string argument "FORCE" can be specified to
+     force resetting the file pointer struct.  However, in case of UNO,
+     a hidden OOo invocation may linger on in memory then, preventing
+     proper closing of Octave.
+
+     For writing .ods files you need the Java package >= 1.2.6 plus
+     odfdom.jar + xercesImpl.jar and/or jopendocument-<version>.jar
+     installed on your computer + proper javaclasspath set, to make this
+     function work at all.  For UNO support, Octave-Java package >=
+     1.2.9 is imperative; furthermore the relevant classes had best be
+     added to the javaclasspath by utility function
+     chk_spreadsheet_support().
+
+     ODS must be a valid pointer struct made by odsopen() in the same
+     octave session.
+
+     Examples:
+
+            ods1 = odsclose (ods1);
+            (Close spreadsheet file pointed to in pointer struct ods1; ods1 is reset)
+
+     See also: odsopen, odsread, odswrite, ods2oct, oct2ods, odsfinfo,
+     chk_spreadsheet_support.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Close the OpenOffice_org Calc / Gnumeric spreadsheet pointed to in
+struct ODS, i
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+odsfinfo
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1793
+ -- Function File: [ FILETYPE ] = odsfinfo (FILENAME [, REQINTF])
+ -- Function File: [ FILETYPE , SH_NAMES] = odsfinfo (FILENAME [,
+          REQINTF])
+     Query an OpenOffice_org or Gnumeric spreadsheet file FILENAME (with
+     ods or gnumeric suffix) for some info about its contents.
+
+     If FILENAME is a recognizable OpenOffice.org or Gnumeric
+     spreadsheet file, FILETYPE returns the string "OpenOffice.org Calc
+     spreadsheet" (or "Gnumeric spreadsheet"), or '' (empty string)
+     otherwise.
+
+     If FILENAME is a recognizable OpenOffice.org Calc or Gnumeric
+     spreadsheet file, optional argument SH_NAMES contains a list (cell
+     array) of sheet names contained in FILENAME, in the order (from
+     left to right) in which they occur in the sheet stack.
+
+     If you omit return arguments FILETYPE and SH_NAMES altogether,
+     odsfinfo returns the sheet names and for each sheet the actual
+     occupied data ranges to the screen.The occupied cell range will
+     have to be determined behind the scenes first; this can take some
+     time.
+
+     odsfinfo execution can take its time for large spreadsheets as the
+     entire spreadsheet has to be parsed to get the sheet names, let
+     alone exploring used data ranges.
+
+     By specifying a value of 'jod', 'otk', 'uno' or 'oct' for REQINTF
+     the automatic selection of the Java interface is bypassed and the
+     specified interface will be used (if at all present).
+
+     Examples:
+
+            exist = odsfinfo ('test4.ods');
+            (Just checks if file test4.ods is a readable Calc file)
+
+            [exist, names] = odsfinfo ('test4.ods');
+            (Checks if file test4.ods is a readable Calc file and return a
+             list of sheet names)
+
+     See also: odsread, odsopen, ods2oct, odsclose.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Query an OpenOffice_org or Gnumeric spreadsheet file FILENAME (with ods
+or gnume
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+odsopen
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3027
+ -- Function File: ODS = odsopen (FILENAME)
+ -- Function File: ODS = odsopen (FILENAME, READWRITE)
+ -- Function File: ODS = odsopen (FILENAME, READWRITE, REQINTF)
+     Get a pointer to an OpenOffice_org spreadsheet in the form of
+     return argument ODS.
+
+     Calling odsopen without specifying a return argument is fairly
+     useless!
+
+     Octave links to external software for read/write support of
+     spreadsheets; these links are "interfaces".  For I/O from/to ODS
+     1.2 and Gnumeric XML, in principle no external SW is required, this
+     "interface" is called 'OCT'. For more flexibility and better
+     performance, you need a Java JRE or JDK plus one or more of
+     (ODFtoolkit (version 0.7.5 or 0.8.6 - 0.8.8) & xercesImpl v.2.9.1),
+     jOpenDocument, or OpenOffice.org (or clones) installed on your
+     computer + proper javaclasspath set.  These interfaces are referred
+     to as OTK, JOD, and UNO resp., and are preferred in that order by
+     default (depending on their presence; the OCT interface has lowest
+     priority).  The relevant Java class libs for spreadsheet I/O had
+     best be added to the javaclasspath by utility function
+     chk_spreadsheet_support().
+
+     FILENAME must be a valid .ods OpenOffice.org Calc, or Gnumeric,
+     file name including .ods or .gnumeric suffix.  If FILENAME does not
+     contain any directory path, the file is saved in the current
+     directory.  For UNO bridge, filenames need to be in the form
+     "file:///<path_to_file>/filename"; a URL will also work.  If a
+     plain file name is given (absolute or relative), odsopen() will try
+     to transform it into proper form.
+
+     READWRITE must be set to true or numerical 1 if writing to
+     spreadsheet is desired immediately after calling odsopen().  It
+     merely serves proper handling of file errors (e.g., "file not
+     found" or "new file created").
+
+     Optional input argument REQINTF can be used to override the ODS
+     interface automatically selected by odsopen.  Currently implemented
+     interfaces are 'OTK' (Java/ODF Toolkit), 'JOD'
+     (Java/jOpenDocument), 'UNO' (Java/OpenOffice.org UNO bridge), and
+     'OCT' (native Octave, for Gnumeric.  In most situations this
+     parameter is unneeded as odsopen automatically selects the most
+     useful interface present ("default interface").  Depending on file
+     type, odsopen.m can invoke other detected interfaces than the
+     default one.
+
+     Beware: The UNO interface is still experimental.  While in itself
+     reliable, it may have undesired side effects on Open-/LibreOffice
+     windows outside Octave.
+
+     Examples:
+
+            ods = odsopen ('test1.ods');
+            (get a pointer for reading from spreadsheet test1.ods)
+
+            ods = odsopen ('test2.ods', [], 'JOD');
+            (as above, indicate test2.ods will be read from; in this case using
+             the jOpenDocument interface is requested)
+
+     See also: odsclose, odsread, oct2ods, ods2oct, odsfinfo,
+     chk_spreadsheet_support.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Get a pointer to an OpenOffice_org spreadsheet in the form of return
+argument OD
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+odsread
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 5262
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = odsread
+          (FILENAME)
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = odsread
+          (FILENAME, WSH)
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = odsread
+          (FILENAME, WSH, RANGE)
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = odsread
+          (FILENAME, WSH, RANGE, REQINTF)
+
+     Read data contained from cell range RANGE in worksheet WSH in
+     OpenOffice_org Calc spreadsheet file FILENAME.  Reading Gnumeric
+     xml files is also supported.
+
+     A native Octave interface (OCT) is available, but presently still
+     experimental.  For ODS only the supported Java-based interfaces
+     offer more flexibility and better speed.  For those you need a Java
+     JRE or JDK and one or both of jopendocument-<version>.jar or
+     preferrably: (odfdom.jar (versions 0.7.5 or 0.8.6-0.8.8) &
+     xercesImpl.jar v.  2.9.1) in your javaclasspath.  There is also
+     experimental support invoking OpenOffice.org/LibreOffice or clones
+     through a Java/UNO bridge.  The OCT interface also offers .gnumeric
+     read support.
+
+     Return argument NUMARR contains the numeric data, optional return
+     arguments TXTARR and RAWARR contain text strings and the raw
+     spreadsheet cell data, respectively, and LIMITS is a struct
+     containing the data origins of the various returned arrays.
+
+     If FILENAME does not contain any directory, the file is assumed to
+     be in the current directory.  FILENAME should include the filename
+     extension (.ods).
+
+     WSH is either numerical or text, in the latter case it is
+     case-sensitive and it should conform to OpenOffice.org Calc or
+     Gnumeric sheet name requirements.  Note that in case of a numerical
+     WSH this number refers to the position in the worksheet stack,
+     counted from the left in a Calc window.  The default is numerical
+     1, i.e.  the leftmost worksheet in the Calc file.
+
+     RANGE is expected to be a regular spreadsheet range format, or ""
+     (empty string, indicating all data in a worksheet).  If no range is
+     specified the occupied cell range will have to be determined behind
+     the scenes first; this can take some time.
+
+     If only the first argument is specified, odsread will try to read
+     all contents from the first = leftmost (or the only) worksheet (as
+     if a range of '' (empty string) was specified).
+
+     If only two arguments are specified, odsread assumes the second
+     argument to be WSH and to refer to a worksheet.  In that case
+     odsread tries to read all data contained in that worksheet.
+
+     The optional last argument REQINTF can be used to override the
+     automatic selection by odsread of one interface out of the
+     supported ones: Java/ODFtoolkit ('OTK'), Java/jOpenDocument
+     ('JOD'), Java/UNO bridge ('UNO'), or native Octave (OCT). Octave
+     selects one of these, preferrably in the order above, based on
+     presence of support software and the file at hand.
+
+     Erroneous data and empty cells are set to NaN in NUMARR and turn up
+     empty in TXTARR and RAWARR.  Date/time values in date/time
+     formatted cells are returned as numerical values in OBJ with base
+     1-1-000.  Note that OpenOfice.org and MS-Excel have different date
+     base values (1/1/0000 & 1/1/1900, resp.)  and internal
+     representation so MS-Excel spreadsheets rewritten into .ods format
+     by OpenOffice.org Calc may have different date base values.  As
+     there's no gnumeric formula evaluator and gnumeric doesn't store
+     cached formula results, formulas are returned as text strings when
+     reading from Gnumeric files.
+
+     NUMARR and TXTARR are trimmed from empty outer rows and columns, so
+     any returned array may turn out to be smaller than requested in
+     RANGE.
+
+     When reading from merged cells, all array elements NOT
+     corresponding to the leftmost or upper spreadsheet cell will be
+     treated as if the "corresponding" cells are empty.
+
+     odsread is just a wrapper for a collection of scripts that find out
+     the interface to be used and do the actual reading.  For each call
+     to odsread the interface must be started and the spreadsheet file
+     read into memory.  When reading multiple ranges (in optionally
+     multiple worksheets) a significant speed boost can be obtained by
+     invoking those scripts directly (odsopen / ods2oct [/ parsecell] /
+     ...  / odsclose).  This also offers more flexibility (e.g.  formula
+     results or the formulas themselves; stripping output arrays from
+     empty enveloping rows/columns).
+
+     Examples:
+
+            A = odsread ('test4.ods', '2nd_sheet', 'C3:AB40');
+            (which returns the numeric contents in range C3:AB40 in worksheet
+            '2nd_sheet' from file test4.ods into numeric array A)
+
+            [An, Tn, Ra, limits] = odsread ('Sales2009.ods', 'Third_sheet');
+            (which returns all data in worksheet 'Third_sheet' in file test4.ods
+            into array An, the text data into array Tn, the raw cell data into
+            cell array Ra and the ranges from where the actual data came in limits)
+
+     See also: odsopen, ods2oct, oct2ods, odsclose, odswrite, odsfinfo,
+     parsecell.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Read data contained from cell range RANGE in worksheet WSH in
+OpenOffice_org Cal
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+odswrite
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3403
+ -- Function File: RSTATUS = odswrite (FILENAME, ARR)
+ -- Function File: RSTATUS = odswrite (FILENAME, ARR, WSH)
+ -- Function File: RSTATUS = odswrite (FILENAME, ARR, WSH, RANGE)
+ -- Function File: RSTATUS = odswrite (FILENAME, ARR, WSH, RANGE,
+          REQINTF)
+     Add data in 1D/2D array ARR into sheet WSH in OpenOffice_org Calc
+     spreadsheet file FILENAME in cell range RANGE.  Gnumeric files can
+     also be written.
+
+     RSTATUS returns 1 if write succeeded, 0 otherwise.
+
+     FILENAME must be a valid .ods OpenOffice.org file name (including
+     file name extension).  If FILENAME does not contain any directory
+     path, the file is saved in the current directory.
+
+     ARR can be any 1D or 2D array containing numerical or character
+     data (cellstr) except complex.  Mixed numeric/text arrays can only
+     be cell arrays.
+
+     WSH can be a number or string.  In case of a not yet existing
+     OpenOffice.org spreadsheet, the first sheet will be used & named
+     according to WSH - no extra empty sheets are created.  In case of
+     existing files, some checks are made for existing sheet names or
+     numbers, or whether WSH refers to an existing sheet with a type
+     other than sheet (e.g., chart).  When new sheets are to be added to
+     the spreadsheet file, they are inserted to the right of all
+     existing sheets.  The pointer to the "active" sheet (shown when
+     OpenOffice.org Calc opens the file) remains untouched.
+
+     RANGE is expected to be a regular spreadsheet range.  Data is added
+     to the sheet; existing data in the requested range will be
+     overwritten.  Array ARR will be clipped at the right and/or bottom
+     if its size is bigger than can be accommodated in RANGE.  If ARR is
+     smaller than the RANGE allows, it is placed in the top left
+     rectangle of RANGE and cell values outside that rectangle will be
+     untouched.
+
+     If RANGE contains merged cells, only the elements of ARR
+     corresponding to the top or left Calc cells of those merged cells
+     will be written, other array cells corresponding to that cell will
+     be ignored.
+
+     The optional last argument REQINTF can be used to override the
+     automatic selection by odswrite of one interface out of the
+     supported ones: Java/ODFtooolkit ('OTK'), Java/jOpenDocument
+     ('JOD'), Java/OpenOffice.org ('UNO'), or native Octave ('OCT'). For
+     writing gnumeric, the OCT interface is automatically selected and
+     need not be specified.
+
+     odswrite is a mere wrapper for various scripts which find out what
+     ODS interface to use (ODF toolkit, jOpenDocument, Open/LibreOffice
+     or native Octave) plus code to mimic the other brand's xlswrite
+     syntax (and quirks).  For each call to odswrite such an interface
+     must be started and possibly an ODS file loaded.  When writing to
+     multiple ranges and/or worksheets in the same ODS file, a speed
+     bonus can be obtained by invoking those scripts (odsopen / octods /
+     ....  / odsclose) directly.
+
+     Example:
+
+            status = odswrite ('test4.ods', 'arr', 'Eight_sheet', 'C3:AB40');
+            (which adds the contents of array arr (any type) to range C3:AB40
+            in sheet 'Eight_sheet' in file test4.ods and returns a logical
+            True (= numerical 1) in status if al went well)
+
+     See also: odsread, oct2ods, ods2oct, odsopen, odsclose, odsfinfo.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Add data in 1D/2D array ARR into sheet WSH in OpenOffice_org Calc
+spreadsheet fi
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+parsecell
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1435
+ -- Function File: [ NUMARR , TXTARR, LIM ] = parsecell (RAWARR)
+ -- Function File: [ NUMARR , TXTARR, LIM ] = parsecell (RAWARR, LIMITS)
+
+     Divide a heterogeneous 2D cell array into a 2D numeric array and a
+     2D cell array containing only strings.  Both returned arrays are
+     trimmed from empty outer rows and columns.  This function is
+     particularly useful for parsing cell arrays returned by functions
+     reading spreadsheets (e.g., xlsread, odsread).
+
+     Optional return argument LIM contains two field with the outer
+     column and row numbers of NUMARR and TXTARR in the original array
+     RAWARR.  Optional input argument LIMITS can either be the
+     spreadsheet data limits returned in the spreadsheet file pointer
+     struct (field xls.limits or ods.limits), or the file ptr struct
+     itself.  If one of these is specified, optional return argument LIM
+     will contain the real spreadsheet row & column numbers enclosing
+     the origins of the numerical and text data returned in NUMARR and
+     TXTARR.
+
+     Examples:
+
+            [An, Tn] = parsecell (Rn);
+            (which returns the numeric contents of Rn into array An and the
+             text data into array Tn)
+
+            [An, Tn, lims] = parsecell (Rn, xls.limits);
+            (which returns the numeric contents of Rn into array An and the
+             text data into array Tn.)
+
+     See also: xlsread, odsread, xls2oct, ods2oct.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Divide a heterogeneous 2D cell array into a 2D numeric array and a 2D
+cell array
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+pch2mat
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 424
+ -- Function File: DATA = pch2mat (FILENAME)
+     Converts NASTRAN PCH file (SORT2) to a data structure and frequency
+     vector.  A filename as a string is the only needed input.
+
+     The output is in the form of struct.  containing a freq vector n x
+     1 called data.f, and the remaining data are in the form of
+     subcases, point ids and directions respectively.  for ex.
+     data.S1.p254686.x and they are n x 2
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 75
+Converts NASTRAN PCH file (SORT2) to a data structure and frequency
+vector.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 13
+read_namelist
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 842
+ S = READ_NAMELIST (FILENAME) returns the struct S containing namelists and
+ variables in the file FILENAME organised in hierachical way:
+
+                |--VAR1
+                |--VAR2
+   |-- NMLST_A--|...
+   |            |--VARNa
+   |
+   |            |--VAR1
+   |-- NMLST_B--|--VAR2
+   |            |...
+ S --|     ...    |--VARNb
+     |
+     |            |--VAR1
+     |-- NMLST_M--|--VAR2
+                  |...
+                  |--VARNm
+ 
+ Note:  The function can read multidimensional variables as well. The  
+ function assumes that there is no more than one namelist section per 
+ line. At this time there is no syntax checking functionality so the 
+ function will crash in case of errors.
+  
+ Example:
+     NMLST = read_namelist ("OPTIONS.nam");
+     NMLST.NAM_FRAC.XUNIF_NATURE = 0.1;
+     write_namelist(NMlST, "MOD_OPTIONS.nam");
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+ S = READ_NAMELIST (FILENAME) returns the struct S containing namelists and
+ var
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+rfsearch
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1337
+ -- Function File: FILENAME = rsearchfile (DNAME, FNAME)
+ -- Function File: FILENAME = rsearchfile (DNAME, FNAME, MAXDEPTH)
+     Recursively search for file or filename pattern FNAME starting in
+     directory DNAME and return the first match.
+
+     DNAME and FNAME must be character strings and should conform to the
+     directory name and filename requirements of your operating system.
+     Optional argument MAXDEPTH can be specified to limit the maximum
+     search depth; the default value is 1 (search only in DNAME and
+     subdirs of DNAME).  Setting maxdepth to 0 limits the search to
+     DNAME.  Be careful with setting MAXDEPTH to values > 3 or 4 as this
+     can provoke excessive search times in densely populated directory
+     trees.  Keep in mind that rfsearch is a recursive function itself.
+
+     Output argument FILENAME returns the relative file path of the
+     first match, relative to DNAME, or an empty character string if no
+     match was found.
+
+     Examples:
+
+          filename = rfsearch ("/home/guest/octave", "test.fil")
+          Look for file test.fil and start the search in /home/guest/octave
+
+          filename = rfsearch ("/home", "test.fil", 2)
+          Look for file test.fil, start the search in /home, and if needed
+          search subdirs of subdirs of /home
+
+     See also: dir, glob.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Recursively search for file or filename pattern FNAME starting in
+directory DNAM
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 9
+test_spsh
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 488
+ -- Function File: [ VOID ] = test_sprdsh ()
+     Test functionality of supported spreadsheet interfaces.
+
+     test_spsh tests simply tests all interfaces that are found to be
+     supported by chk_spreadsheet_support() function, one by one.  It
+     invokes the functions io_xls_testscript.m and io_ods_testscript.m
+     for the actual testing.
+
+     As it is meant to be used interactively, no output arguments are
+     returned.
+
+     See also: io_xls_testscript, io_ods_testscript.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 55
+Test functionality of supported spreadsheet interfaces.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 14
+write_namelist
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 814
+ WRITE_NAMELIST(S, FILENAME) writes a namelist data structure S to a
+ file FILENAME. S should follow the following structure:
+
+                  |--VAR1
+                  |--VAR2
+     |-- NMLST_A--|...
+     |            |--VARNa
+     |
+     |            |--VAR1
+     |-- NMLST_B--|--VAR2
+     |            |...
+ S --|     ...    |--VARNb
+     |
+     |            |--VAR1
+     |-- NMLST_M--|--VAR2
+                  |...
+                  |--VARNm
+ 
+ Notes: Only supports variables of type: 
+ Scalars, vectors and 2D numeric arrays (integers and floating points)
+ Scalars and 1D boolean arrays specified as '.true.' and '.false.' strings
+ Single and 1D arrays of strings
+  
+ Example:
+     NMLST = read_namelist ("OPTIONS.nam");
+     NMLST.NAM_FRAC.XUNIF_NATURE = 0.1;
+     write_namelist(NMlST, "MOD_OPTIONS.nam");
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+ WRITE_NAMELIST(S, FILENAME) writes a namelist data structure S to a
+ file FILEN
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+xls2oct
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 4483
+ -- Function File: [ RAWARR , XLS, RSTATUS ] = xls2oct (XLS)
+ -- Function File: [ RAWARR , XLS, RSTATUS ] = xls2oct (XLS, WSH)
+ -- Function File: [ RAWARR , XLS, RSTATUS ] = xls2oct (XLS, WSH, RANGE)
+ -- Function File: [ RAWARR , XLS, RSTATUS ] = xls2oct (XLS, WSH, RANGE,
+          OPTIONS)
+
+     Read data contained within cell range RANGE from worksheet WSH in
+     an Excel spreadsheet file pointed to in struct XLS.  Gnumeric files
+     can be read as well.
+
+     XLS is supposed to have been created earlier by xlsopen in the same
+     octave session.
+
+     WSH is either numerical or text, in the latter case it is
+     case-sensitive and it may be max.  31 characters long.  Note that
+     in case of a numerical WSH this number refers to the position in
+     the worksheet stack, counted from the left in an Excel window.  The
+     default is numerical 1, i.e.  the leftmost worksheet in the Excel
+     file.
+
+     RANGE is expected to be a regular spreadsheet range format, or ""
+     (empty string, indicating all data in a worksheet).  If no range is
+     specified the occupied cell range will have to be determined behind
+     the scenes first; this can take some time for the Java-based
+     interfaces.  Be aware that in COM/ActiveX interface the used range
+     can be outdated.  The Java-based interfaces are more reliable in
+     this respect albeit much slower.
+
+     Optional argument OPTIONS, a structure, can be used to specify
+     various read modes by setting option fields in the struct to true
+     (1) or false (0).  Currently recognized option fields are:
+
+     "formulas_as_text"
+          If set to TRUE or 1, spreadsheet formulas (if at all present)
+          are read as formula strings rather than the evaluated formula
+          result values.  The default value is 0 (FALSE).
+
+     'strip_array'
+          Set the value of this field set to TRUE or 1 to strip the
+          returned output array RAWARR from empty outer columns and
+          rows.  The spreadsheet cell rectangle limits from where the
+          data actually came will be updated.  The default value is
+          FALSE or 0 (no cropping).  When using the COM interface, the
+          output array is always cropped.
+
+     If only the first argument XLS is specified, xls2oct will try to
+     read all contents from the first = leftmost (or the only) worksheet
+     (as if a range of '' (empty string) was specified).
+
+     If only two arguments are specified, xls2oct assumes the second
+     argument to be WSH.  In that case xls2oct will try to read all data
+     contained in that worksheet.
+
+     Return argument RAWARR contains the raw spreadsheet cell data.  Use
+     parsecell() to separate numeric and text values from RAWARR.
+
+     Optional return argument XLS contains the pointer struct, If any
+     data have been read, field XLS.limits contains the outermost column
+     and row numbers of the actually returned cell range.
+
+     Optional return argument RSTATUS will be set to 1 if the requested
+     data have been read successfully, 0 otherwise.
+
+     Erroneous data and empty cells turn up empty in RAWARR.  Date/time
+     values in Excel are returned as numerical values.  Note that Excel
+     and Octave have different date base values (1/1/1900 & 1/1/0000,
+     resp.)  Be aware that Excel trims RAWARR from empty outer rows &
+     columns, so any returned cell array may turn out to be smaller than
+     requested in RANGE, independent of field 'formulas_as_text' in
+     OPTIONS.  When using COM, POI, or UNO interface, formulas in cells
+     are evaluated; if that fails cached values are retrieved.  These
+     may be outdated depending on Excel's "Automatic calculation"
+     settings when the spreadsheet was saved.
+
+     When reading from merged cells, all array elements NOT
+     corresponding to the leftmost or upper Excel cell will be treated
+     as if the "corresponding" Excel cells are empty.
+
+     Beware: when the COM interface is used, hidden Excel invocations
+     may be kept running silently in case of COM errors.
+
+     Examples:
+
+            A = xls2oct (xls1, '2nd_sheet', 'C3:AB40');
+            (which returns the numeric contents in range C3:AB40 in worksheet
+            '2nd_sheet' from a spreadsheet file pointed to in pointer struct xls1,
+            into numeric array A)
+
+            [An, xls2, status] = xls2oct (xls2, 'Third_sheet');
+
+     See also: oct2xls, xlsopen, xlsclose, parsecell, xlsread, xlsfinfo,
+     xlswrite .
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Read data contained within cell range RANGE from worksheet WSH in an
+Excel sprea
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+xlsclose
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 1948
+ -- Function File: [ XLS ] = xlsclose (XLS)
+ -- Function File: [ XLS ] = xlsclose (XLS, FILENAME)
+ -- Function File: [ XLS ] = xlsclose (XLS, "FORCE")
+     Close the Excel spreadsheet pointed to in struct XLS, if needed
+     write the file to disk.  Based on information contained in XLS,
+     xlsclose will determine if the file should be written to disk.
+
+     If no errors occured during writing, the xls file pointer struct
+     will be reset and -if COM interface was used- ActiveX/Excel will be
+     closed.  However if errors occurred, the file pinter will be
+     untouched so you can clean up before a next try with xlsclose().
+     Be warned that until xlsopen is called again with the same XLS
+     pointer struct, hidden Excel or Java applications with associated
+     (possibly large) memory chunks are kept in memory, taking up
+     resources.  If (string) argument "FORCE" is supplied, the file
+     pointer will be reset regardless, whether the possibly modified
+     file has been saved successfully or not.  Hidden Excel (COM) or
+     OpenOffice.org (UNO) invocations may live on, possibly even
+     impeding proper shutdown of Octave.
+
+     FILENAME can be used to write changed spreadsheet files to an other
+     file than opened with xlsopen(); unfortunately this doesn't work
+     with JXL (JExcelAPI) interface.
+
+     For other file formats than OOXML and ODS, you need MS-Excel (95 -
+     2010), and/or the Java package => 1.2.8 plus Apache POI > 3.5
+     and/or JExcelAPI and/or OpenXLS and/or OpenOffice.org or clones
+     installed on your computer + proper javaclasspath set, to make this
+     function work at all.
+
+     XLS must be a valid pointer struct made by xlsopen() in the same
+     octave session.
+
+     Examples:
+
+            xls1 = xlsclose (xls1);
+            (Close spreadsheet file pointed to in pointer struct xls1; xls1 is reset)
+
+     See also: xlsopen, xlsread, xlswrite, xls2oct, oct2xls, xlsfinfo.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Close the Excel spreadsheet pointed to in struct XLS, if needed write
+the file t
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+xlsfinfo
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 2534
+ -- Function File: [ FILETYPE ] = xlsfinfo (FILENAME [, REQINTF])
+ -- Function File: [ FILETYPE , SH_NAMES] = xlsfinfo (FILENAME [,
+          REQINTF])
+ -- Function File: [ FILETYPE , SH_NAMES, FFORMAT] = xlsfinfo (FILENAME
+          [, REQINTF])
+     Query Excel spreadsheet file FILENAME for some info about its
+     contents.
+
+     If FILENAME is a recognizable Excel spreadsheet file, FILETYPE
+     returns the string "Microsoft Excel Spreadsheet", or '' (empty
+     string) otherwise.
+
+     If FILENAME is a recognizable Excel spreadsheet file, optional
+     argument SH_NAMES contains a list (cell array) of sheet names (and
+     in case Excel is installed: sheet types) contained in FILENAME, in
+     the order (from left to right) in which they occur in the sheet
+     stack.
+
+     Optional return value FFORMAT currently returns '' (empty string)
+     unless FILENAME is a readable Excel 97-2003 .xls file or an Excel
+     2007 .xlsx / .xlsb file in which case FFORMAT is set to
+     "xlWorkbookNormal".  Excel 95 .xls files can only be read through
+     the JXL (JExcelAPI) or UNO (OpenOffice.org) Java-based interfaces.
+
+     If no return arguments are specified the sheet names are echoed to
+     the terminal screen; in case of Java interfaces for each sheet the
+     actual occupied data range is echoed as well.  The occupied cell
+     range will have to be determined behind the scenes first; this can
+     take some time for the Java-based interfaces.
+
+     If multiple xls interfaces have been installed, REQINTF can be
+     specified.  This can sometimes be handy, e.g.  to get an idea of
+     occupied cell ranges in each worksheet using different interfaces
+     (due to cached info and/or different treatment of empty but
+     formatted cells, each interfaces may give different results).
+
+     For OOXML spreadsheets no external SW is required but full POI
+     and/or UNO support (see xlsopen) may work better or faster; to use
+     those specify 'poi' or 'uno' for REQINTF.  For Excel 95 files use
+     'com' (windows only), 'jxl' or 'uno'.  Gnumeric files can be
+     explored with the built-in OCT interface (no need to specify
+     REQINTF then).
+
+     Examples:
+
+            exist = xlsfinfo ('test4.xls');
+            (Just checks if file test4.xls is a readable Excel file)
+
+            [exist, names] = xlsfinfo ('test4.xls');
+            (Checks if file test4.xls is a readable Excel file and return a
+             list of sheet names and -types)
+
+     See also: oct2xls, xlsread, xls2oct, xlswrite.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 71
+Query Excel spreadsheet file FILENAME for some info about its contents.
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+xlsopen
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 3310
+ -- Function File: XLS = xlsopen (FILENAME)
+ -- Function File: XLS = xlsopen (FILENAME, READWRITE)
+ -- Function File: XLS = xlsopen (FILENAME, READWRITE, REQINTF)
+     Get a pointer to an Excel spreadsheet in the form of return
+     argument (file pointer struct) XLS.  After processing the
+     spreadsheet, the file pointer must be explicitly closed by calling
+     xlsclose().
+
+     Calling xlsopen without specifying a return argument is fairly
+     useless!
+
+     xlsopen works with interfaces, which are links to external
+     software.  For I/O from/to OOXML (Excel 2007 and up), ODS 1.2 and
+     Gnumeric, no additional software is required when the OCT interface
+     is used (see below).  For all other spreadsheet formats, you need
+     one or more of MS-Excel (95 - 2013), or a Java JRE plus Apache POI
+     >= 3.5 and/or JExcelAPI and/or OpenXLS and/or OpenOffice.org (or
+     clones) installed on your computer + proper javaclasspath set.
+     These interfaces are referred to as COM, POI, JXL, OXS, and UNO,
+     resp., and are preferred in that order by default (depending on
+     their presence).  Currently the OCT interface has the lowest
+     priority as it is still experimental.  For OOXML read/write support
+     in principle no additional SW is needed.  However, the COM, POI and
+     UNO interfaces may provide better OOXML write performance and/or
+     more flexibility.  Excel'95 spreadsheets (BIFF5) can only be read
+     using the COM (Excel-ActiveX), JXL (JExcelAPI), and UNO
+     (Open-/LibreOffice) interfaces.
+
+     FILENAME should be a valid .xls or xlsx Excel file name (including
+     extension).  But if you use the COM interface you can specify any
+     extension that your installed Excel version can read AND write; the
+     same goes for UNO (OpenOffice.org).  Using the other Java
+     interfaces, only .xls or .xlsx are allowed.  If FILENAME does not
+     contain any directory path, the file is saved in the current
+     directory.
+
+     If READWRITE is set to 0 (default value) or omitted, the
+     spreadsheet file is opened for reading.  If READWRITE is set to
+     true or 1, a spreadsheet file is opened (or created) for reading &
+     writing.
+
+     Optional input argument REQINTF can be used to override the Excel
+     interface that otherwise is automatically selected by xlsopen.
+     Currently implemented interfaces (in order of preference) are 'COM'
+     (Excel/COM), 'POI' (Java/Apache POI), 'JXL' (Java/JExcelAPI), 'OXS'
+     (Java/OpenXLS), 'UNO' (Java/OpenOffice.org - EXPERIMENTAL!), or
+     'OCT' (native Octave).  In most situations this parameter is
+     unneeded as xlsopen automatically selects the most useful interface
+     present.
+
+     Beware: Excel invocations may be left running invisibly in case of
+     COM errors or forgetting to close the file pointer.  Similarly for
+     OpenOffice.org which may even prevent Octave from being closed.
+
+     Examples:
+
+            xls = xlsopen ('test1.xls');
+            (get a pointer for reading from spreadsheet test1.xls)
+
+            xls = xlsopen ('test2.xls', 1, 'POI');
+            (as above, indicate test2.xls will be written to; in this case using Java
+             and the Apache POI interface are requested)
+
+     See also: xlsclose, xlsread, xlswrite, xls2oct, oct2xls, xlsfinfo.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Get a pointer to an Excel spreadsheet in the form of return argument
+(file point
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 7
+xlsread
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 6057
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = xlsread
+          (FILENAME)
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = xlsread
+          (FILENAME, WSH)
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = xlsread
+          (FILENAME, RANGE)
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = xlsread
+          (FILENAME, WSH, RANGE)
+ -- Function File: [ NUMARR , TXTARR, RAWARR, LIMITS] = xlsread
+          (FILENAME, WSH, RANGE, REQINTF)
+
+     Read data contained in range RANGE from worksheet WSH in Excel
+     spreadsheet file FILENAME.  Gnumeric files can also be read.
+     Return argument NUMARR contains the numeric data, optional return
+     arguments TXTARR and RAWARR contain text strings and the raw
+     spreadsheet cell data, respectively.  Return argument LIMITS
+     contains the outer column/row numbers of the read spreadsheet range
+     where NUMARR, TXTARR and RAWARR have come from (remember, xlsread
+     trims outer rows and columns).
+
+     If FILENAME does not contain any directory, the file is assumed to
+     be in the current directory.  The filename extension (.xls or
+     .xlsx) must be included in the file name; when using the COM
+     interface all file formats can be read that are supported by the
+     locally installed MS-Excel version (e.g., wk1, csv, dbf, etc.).
+     The same holds for UNO (OpenOffice.orgor LibreOffice).
+
+     RANGE is expected to be a regular spreadsheet range format, or ""
+     (empty string, indicating all data in a worksheet).  If no range is
+     specified the occupied cell range will have to be determined behind
+     the scenes first; this can take some time for the Java-based
+     interfaces (but the results may be more reliable than that of
+     ActiveX/COM).
+
+     WSH is either numerical or text; in the latter case it is
+     case-sensitive and it may be max.  31 characters long.  Note that
+     in case of a numerical WSH this number refers to the position in
+     the worksheet stack, counted from the left in an Excel window.  The
+     default is numerical 1, i.e.  the leftmost worksheet in the Excel
+     file.
+
+     If only the first argument is specified, xlsread will try to read
+     all contents (as if a range of '' (empty string) was specified)
+     from the first = leftmost (or the only) worksheet
+
+     If only two arguments are specified, xlsread assumes the second
+     argument to be RANGE if it is a string argument and contains a ":"
+     or if it is '' (empty string), and in those cases assumes the data
+     must be read from the first worksheet (not necessarily Sheet1!  but
+     the leftmost sheet).
+
+     However, if only two arguments are specified and the second
+     argument is numeric or a text string that does not contain a ":",
+     it is assumed to be WSH and to refer to a worksheet.  In that case
+     xlsread tries to read all data contained in that worksheet.
+
+     The optional last argument REQINTF can be used to override the
+     automatic interface selection by xlsread out of the supported ones:
+     COM/Excel, Java/Apache POI, Java/JExcelAPI, Java/OpenXLS, Java/UNO
+     (OpenOffice.org), or native Octave (in that -built in- order of
+     preference).  For I/O to/from OOXML files a value of 'com', 'poi',
+     'uno', or 'oct' must be specified for REQINTF (see help for
+     xlsopen).  For Excel'95 files use 'com', or if Excel is not
+     installed use 'jxl', 'basic' or 'uno'.  POI can't read Excel'95 but
+     will try to fall back to JXL. As REQINTF can also be a cell array
+     of strings, one can select or exclude one or more interfaces.  In
+     addition the OCT interface offers .gnumeric read support.
+
+     Erroneous data and empty cells are set to NaN in NUMARR and turn up
+     empty in TXTARR and RAWARR.  Date/time values in Excel are returned
+     as numerical values in NUMARR.  Note that Excel and Octave have
+     different date base values (1/1/1900 & 1/1/0000, resp.).  When
+     using the COM interface, spreadsheet date values lying before
+     1/1/1900 are returned as strings, formatted as they appear in the
+     spreadsheet.  NUMARR and TXTARR are trimmed from empty outer rows
+     and columns.  Be aware that Excel does the same for RAWARR, so any
+     returned array may turn out to be smaller than requested in RANGE.
+     Use the fourth return argument LIMS for info on the cell ranges
+     your date came from.
+
+     When reading from merged cells, all array elements NOT
+     corresponding to the leftmost or upper Excel cell will be treated
+     as if the "corresponding" Excel cells are empty.
+
+     xlsread is just a wrapper for a collection of scripts that find out
+     the interface to be used (COM, Java/POI, Java/JXL Java/OXS,
+     Java/UNO, OCT) and do the actual reading.  For each call to xlsread
+     the interface must be started and the Excel file read into memory.
+     When reading multiple ranges (in optionally multiple worksheets) a
+     significant speed boost can be obtained by invoking those scripts
+     directly as in: xlsopen / xls2oct [/ parsecell] / ...  / xlsclose
+
+     Beware: when using the COM interface, hidden Excel invocations may
+     be kept running silently if not closed explicitly.
+
+     Examples:
+
+            A = xlsread ('test4.xls', '2nd_sheet', 'C3:AB40');
+            (which returns the numeric contents in range C3:AB40 in worksheet
+            '2nd_sheet' from file test4.xls into numeric array A)
+
+            [An, Tn, Ra, limits] = xlsread ('Sales2009.xls', 'Third_sheet');
+            (which returns all data in worksheet 'Third_sheet' in file 'Sales2009.xls'
+            into array An, the text data into array Tn, the raw cell data into
+            cell array Ra and the ranges from where the actual data came in limits)
+
+            numarr = xlsread ('Sales2010.xls', 4, [], {'JXL', 'COM'});
+            (Read all data from 4th worksheet in file Sales2010.xls using either JXL
+             or COM interface (i.e, exclude POI interface).
+
+     See also: xlswrite, xlsopen, xls2oct, xlsclose, xlsfinfo, oct2xls.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Read data contained in range RANGE from worksheet WSH in Excel
+spreadsheet file 
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+xlswrite
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 4360
+ -- Function File: RSTATUS = xlswrite (FILENAME, ARR)
+ -- Function File: RSTATUS = xlswrite (FILENAME, ARR, WSH)
+ -- Function File: RSTATUS = xlswrite (FILENAME, ARR, WSH, RANGE)
+ -- Function File: RSTATUS = xlswrite (FILENAME, ARR, WSH, RANGE,
+          REQINTF)
+     Add data in 1D/2D array ARR to worksheet WSH in Excel spreadsheet
+     file FILENAME in cell range RANGE.  Gnumeric files can also be
+     written.
+
+     RSTATUS returns 1 if write succeeded, 0 otherwise.
+
+     FILENAME must be a valid .xls Excel file name (including file name
+     extension).  If FILENAME does not contain any directory path, the
+     file is saved in the current directory.
+
+     ARR can be any 1D or 2D array containing numerical or character
+     data (cellstr) except complex.  Mixed numeric/text arrays can only
+     be cell arrays.
+
+     If only 3 arguments are given, the 3rd is assumed to be a
+     spreadsheet range if it contains a ":" or is a completely empty
+     string (corresponding to A1:IV65336 for regular .xls or
+     A1:XFD1048576 for OOXML .xlsx).  The 3rd argument is assumed to
+     refer to a worksheet if it is a numeric value or a non-empty text
+     string not containing ":"
+
+     WSH can be a number or string (max.  31 chars).  In case of a not
+     yet existing Excel file, the first worksheet will be used & named
+     according to WSH - the extra worksheets that Excel usually creates
+     by default are deleted (COM) or simply not created.  In case of
+     existing files, some checks are made for existing worksheet names
+     or numbers, or whether WSH refers to an existing sheet with a type
+     other than worksheet (e.g., chart).  When new worksheets are to be
+     added to the Excel file, they are inserted to the right of all
+     existing worksheets.  The pointer to the "active" sheet (shown when
+     Excel opens the file) remains untouched.
+
+     RANGE is expected to be a regular spreadsheet range.  Data is added
+     to the worksheet; existing data in the requested range will be
+     overwritten.  Array ARR will be clipped at the right and/or bottom
+     if its size is bigger than can be accommodated in RANGE.  If ARR is
+     smaller than the RANGE allows, it is placed in the top left
+     rectangle of RANGE and remaining cell values outside the rectangle
+     will be retained.
+
+     If RANGE contains merged cells, only the elements of ARR
+     corresponding to the top or left Excel cells of those merged cells
+     will be written, other array cells corresponding to that cell will
+     be ignored.
+
+     The optional last argument REQINTF can be used to override the
+     automatic selection by xlswrite of one interface out of the
+     supported ones: 'com' (ActiveX/Excel), 'poi' (Java/Apache POI),
+     'jxl' (Java/JExcelAPI), 'uno' (Java/OpenOffice.org), or 'OCT'
+     (native Octave w/o any external support software).  'oxs'
+     (Java/OpenXLS) has been implemented but disabled for writing OOXML
+     as it is too buggy; for BIFF8 (Excel '97 .xls) it works reliably.
+     For writing to OOXML files (.xlsx) a value of 'com', 'poi', 'uno',
+     or 'oct' must be specified for REQINTF.  The value of REQINTF is
+     case-insensitive.  Multiple interfaces can be selected if entered
+     as a cell array of strings.  Writing gnumeric files can only be
+     done with the OCT interface, selected automatically for those
+     files.
+
+     xlswrite is a mere wrapper for various scripts which find out what
+     Excel interface to use (COM, POI, etc) plus code to mimic the other
+     brand's syntax.  For each call to xlswrite such an interface must
+     be started and possibly an Excel file loaded.  When writing to
+     multiple ranges and/or worksheets in the same Excel file, a speed
+     bonus can be obtained by invoking those scripts directly with
+     multiple calls to oct2xls (one for each sheet or range) surrounded
+     by one call to xlsopen and xlsclose: (xlsopen / octxls / oct2xls /
+     ....  / xlsclose)
+
+     Examples:
+
+            status = xlswrite ('test4.xls', 'arr', 'Third_sheet', 'C3:AB40');
+            (which adds the contents of array arr (any type) to range C3:AB40
+            in worksheet 'Third_sheet' in file test4.xls and returns a logical
+            True (= numerical 1) in status if al went well)
+
+     See also: xlsread, oct2xls, xls2oct, xlsopen, xlsclose, xlsfinfo.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 80
+Add data in 1D/2D array ARR to worksheet WSH in Excel spreadsheet file
+FILENAME 
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 8
+xmlwrite
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 212
+ -- Function File: NB = xmlwrite (FILENAME, VALUE)
+ -- Function File: NB = xmlwrite (FD, VALUE, [NAME])
+
+     Write a VALUE into FILENAME (FD) as an XML file.
+
+     The number of elements (NB) or 0 is returned.
+
+
+
+
+# name: <cell-element>
+# type: sq_string
+# elements: 1
+# length: 48
+Write a VALUE into FILENAME (FD) as an XML file.
+
+
+
+
+

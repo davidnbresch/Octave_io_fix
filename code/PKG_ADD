@@ -1,0 +1,87 @@
+## PKG_ADD
+## add paths of io pkg java jars. 
+
+## First check if Java support was built in anyway
+if (octave_config_info ("features").JAVA)
+  ## OK, Java built-in / supported. Check environment var
+  userdir = getenv ("OCTAVE_IO_JAVALIBS");
+  if (ispc)
+    homedir = getenv ("USERPROFILE");
+    # (MinGW) assume jar files are in /lib/java 
+    libdir = octave_config_info ("libdir");
+# elseif (ismac)
+#   ## Who knows where OSX keeps e.g., Apache POI stuff? if it does at all...
+  elseif (isunix)
+    homedir = tilde_expand ("~");
+    ## On linux spreadsheet .jars are often found somewhere in /usr/share/java
+    libdir = "/usr/share";
+  else
+    ## Set libdir to "." to avoid searching in a root dir
+    libdir = ".";
+  endif
+
+  ## Find LibreOffice or OpenOffice.org
+  ooopath = '';
+  ii = 0;
+  ## Possible locations for  OOo or LO.
+  bnam = {"C:/Program Files (X86)", ...
+               "C:/Program Files", ...
+               "C:/Programs", ...
+               "/opt", ...
+               "/usr/lib"};
+  if (strcmpi (octave_config_info ("USE_64_BIT_IDX_T"), "yes"))
+    ## 64-bit Octave won't work with 32-bit LibreOffice/OpenOffice.org
+    bnam(1) = [];
+  endif
+  while (isempty (ooopath) && ii < numel (bnam))
+    ooopath = glob ([ bnam{++ii} filesep "[Ll]ibre[Oo]ffice*"]);
+  endwhile
+  while (isempty (ooopath) && ii < numel (bnam))
+    ooopath = glob ([ bnam{++ii} filesep "[Oo]pen[Oo]ffice.org*"]);
+  endwhile
+  while (isempty (ooopath) && ii < numel (bnam))
+    ooopath = glob ([ bnam{++ii} filesep "ooo*"]);
+  endwhile
+  if (! isempty (ooopath))
+    ooopath = ooopath{:};
+  else
+    ooopath = '';
+  endif
+
+  ## One big try-catch to circumvent possible problems on Linux
+  try
+    if (! isempty (userdir))
+      if (strcmpi (userdir, "no") || strcmpi (userdir, "false") || strcmpi (userdir, "0"))
+        ## Do not load Java class libs .jar files). First clean up, then return
+        clear libdir spr_status userdir homedir bnam ooopath ii;
+        return
+      endif
+      ## First allow some time for io package to be fully loaded
+      pause (0.25);
+      ## Check first for user-, then system supplied jars
+      if (exist (userdir) == 7)
+        ## Userdir is a subdir
+        spr_status = chk_spreadsheet_support (userdir, 0, ooopath);
+      endif
+      ## Also try user's home directory
+    elseif (isunix && ...
+      ! (strcmpi (userdir, "no") || strcmpi (userdir, "false") || strcmpi (userdir, "0")))
+      ## On non-Windows systems, automatic loading of Java classes is opt-in due to
+      ## excessive search time (see bug #42044). Most of the delay is due to searching
+      ## for the Libre/OpenOffice.org jars
+      clear libdir spr_status userdir homedir bnam ooopath ii;
+      return
+    else
+      ## Allow some time for io package to be fully loaded
+      pause (0.25);
+    endif
+    ## Try <HOME>/java
+    spr_status = chk_spreadsheet_support ([ homedir filesep "java" ], 0, ooopath);
+    ## Only then search for system-supplied jars. ooopath has been searched
+    spr_status = chk_spreadsheet_support ([ libdir filesep "java" ], 0);
+  catch
+    warning ("(Automatic loading of spreadsheet I/O Java classlibs failed)\n");
+  end_try_catch
+endif
+## Clean up
+clear libdir spr_status userdir homedir bnam ooopath ii;
